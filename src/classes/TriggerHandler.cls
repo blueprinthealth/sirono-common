@@ -23,8 +23,7 @@
  * @see TriggerHandlerFactory
  * @see TriggerHandlerDispatcher
  */
-public interface TriggerHandler {
-
+global interface TriggerHandler {
     /**
      * Called before inserting SObjects.
      */

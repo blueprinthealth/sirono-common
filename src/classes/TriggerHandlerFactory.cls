@@ -26,8 +26,7 @@
  * @see TriggerHandler
  * @see TriggerHandlerDispatcher
  */
-public interface TriggerHandlerFactory {
-
+global interface TriggerHandlerFactory {
     /**
      * Creates a trigger handler for the current DML event.
      *

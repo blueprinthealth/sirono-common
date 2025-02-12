@@ -51,7 +51,23 @@ public inherited sharing class TriggerHandlerDispatcher {
             LOG.error(message);
             throw new IllegalArgumentException(message);
         }
-        TriggerHandlerFactory factory = (TriggerHandlerFactory) instance;
+        TriggerHandlerFactory factory = (TriggerHandlerFactory)instance;
+
+        dispatch(factory);
+    }
+
+    /**
+     * Dispatch the current trigger event to a trigger handler created using the specified factory.
+     *
+     * @param factory the trigger handler factory used to create the trigger handler
+     */
+    public static void dispatch(TriggerHandlerFactory factory) {
+        // Make sure this is running in the context of a trigger
+        if (!isExecuting()) {
+            String message = 'Trigger handler must only be invoked in the context of an executing trigger.';
+            LOG.error(message);
+            throw new IllegalStateException(message);
+        }
 
         // Create the trigger handler
         TriggerHandler handler = factory.create(isDelete() ? Trigger.old : Trigger.new, Trigger.oldMap);

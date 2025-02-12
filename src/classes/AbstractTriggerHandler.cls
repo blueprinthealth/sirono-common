@@ -22,29 +22,28 @@
  * @see TriggerHandler
  * @see TriggerHandlerDispatcher
  */
-public abstract with sharing class AbstractTriggerHandler implements TriggerHandler {
-
+global abstract with sharing class AbstractTriggerHandler implements TriggerHandler {
     // Default/no-op implementations of the trigger event handler methods
 
-    public virtual void beforeInsert() {
+    global virtual void beforeInsert() {
     }
 
-    public virtual void afterInsert() {
+    global virtual void afterInsert() {
     }
 
-    public virtual void beforeUpdate() {
+    global virtual void beforeUpdate() {
     }
 
-    public virtual void afterUpdate() {
+    global virtual void afterUpdate() {
     }
 
-    public virtual void beforeDelete() {
+    global virtual void beforeDelete() {
     }
 
-    public virtual void afterDelete() {
+    global virtual void afterDelete() {
     }
 
-    public virtual void afterUndelete() {
+    global virtual void afterUndelete() {
     }
 
     /**
@@ -55,7 +54,7 @@ public abstract with sharing class AbstractTriggerHandler implements TriggerHand
      *
      * @return the requested field value, or <code>null</code> if either the object or the field is <code>null</code>
      */
-    @TestVisible protected Object getFieldValue(SObject obj, SObjectField field) {
+    public Object getFieldValue(SObject obj, SObjectField field) {
         Object fieldValue = (obj != null) && (field != null) ? obj.get(field) : null;
         return fieldValue;
     }
@@ -69,7 +68,7 @@ public abstract with sharing class AbstractTriggerHandler implements TriggerHand
      *
      * @return <code>true</code> if the value has changed; otherwise <code>false</code>
      */
-    @TestVisible protected Boolean fieldValueChanged(SObject oldObject, SObject newObject, SObjectField field) {
+    public Boolean fieldValueChanged(SObject oldObject, SObject newObject, SObjectField field) {
         Object oldValue = getFieldValue(oldObject, field);
         Object newValue = getFieldValue(newObject, field);
         return oldValue != newValue;
@@ -85,9 +84,37 @@ public abstract with sharing class AbstractTriggerHandler implements TriggerHand
      *
      * @return <code>true</code> if the value has been set; otherwise <code>false</code>
      */
-    @TestVisible protected Boolean fieldValueSet(SObject oldObject, SObject newObject, SObjectField field) {
+    public Boolean fieldValueSet(SObject oldObject, SObject newObject, SObjectField field) {
         Object oldValue = getFieldValue(oldObject, field);
         Object newValue = getFieldValue(newObject, field);
         return (oldValue == null) && (newValue != null);
+    }
+
+    /**
+     * Extracts the value for the specified field from the provided object.
+     *
+     * @param obj the SObject from which the value should be extracted
+     * @param field the field for which the value should be extracted
+     *
+     * @return the requested field value, or <code>null</code> if either the object or the field is <code>null</code>
+     */
+    public Object getFieldValue(SObject obj, String field) {
+        Object fieldValue = (obj != null) && (field != null) ? obj.get(field) : null;
+        return fieldValue;
+    }
+
+    /**
+     * Determines whether the specified field value has changed from the old object to the new object.
+     *
+     * @param oldObject the old object, typically from <code>Trigger.oldMap</code>
+     * @param newObject the new object, typically from <code>Trigger.new</code>
+     * @param field the field which should be checked for a value change
+     *
+     * @return <code>true</code> if the value has changed; otherwise <code>false</code>
+     */
+    public Boolean fieldValueChanged(SObject oldObject, SObject newObject, String field) {
+        Object oldValue = getFieldValue(oldObject, field);
+        Object newValue = getFieldValue(newObject, field);
+        return oldValue != newValue;
     }
 }
