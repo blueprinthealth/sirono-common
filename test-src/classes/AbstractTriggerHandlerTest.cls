@@ -15,9 +15,9 @@
  */
 
 @IsTest
-private class AbstractTriggerHandlerTest {
+public class AbstractTriggerHandlerTest {
     @IsTest
-    static void testGetFieldValue() {
+    static void testGetFieldValueSObjectField() {
         TestTriggerHandler triggerHandler = new TestTriggerHandler();
 
         // Happy path
@@ -26,8 +26,8 @@ private class AbstractTriggerHandlerTest {
         Assert.equals('Foo', lastNameValue);
 
         // Null handling
-        Assert.isNull(triggerHandler.getFieldValue(null, null));
-        Assert.isNull(triggerHandler.getFieldValue(c, null));
+        Assert.isNull(triggerHandler.getFieldValue(null, (SObjectField)null));
+        Assert.isNull(triggerHandler.getFieldValue(c, (SObjectField)null));
         Assert.isNull(triggerHandler.getFieldValue(null, Contact.LastName));
 
         // Invalid field for type
@@ -40,7 +40,7 @@ private class AbstractTriggerHandlerTest {
     }
 
     @IsTest
-    static void testFieldValueChanged() {
+    static void testFieldValueChangedSObjectField() {
         TestTriggerHandler triggerHandler = new TestTriggerHandler();
 
         Contact oldContact = new Contact(FirstName = 'Baz', LastName = 'Foo');
@@ -51,17 +51,69 @@ private class AbstractTriggerHandlerTest {
         Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, newContact, Contact.FirstName));
 
         // Null handling
-        Assert.isFalse(triggerHandler.fieldValueChanged(null, null, null));
-        Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, null, null));
-        Assert.isFalse(triggerHandler.fieldValueChanged(null, newContact, null));
+        Assert.isFalse(triggerHandler.fieldValueChanged(null, null, (SObjectField)null));
+        Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, null, (SObjectField)null));
+        Assert.isFalse(triggerHandler.fieldValueChanged(null, newContact, (SObjectField)null));
         Assert.isFalse(triggerHandler.fieldValueChanged(null, null, Contact.LastName));
-        Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, newContact, null));
+        Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, newContact, (SObjectField)null));
         Assert.isTrue(triggerHandler.fieldValueChanged(null, newContact, Contact.LastName));
         Assert.isTrue(triggerHandler.fieldValueChanged(oldContact, null, Contact.LastName));
 
         // Invalid field for type
         try {
             triggerHandler.fieldValueChanged(oldContact, newContact, Account.AccountNumber);
+            Assert.fail('Expected an ' + SObjectException.class.getName());
+        } catch (SObjectException e) {
+            // Expected
+        }
+    }
+
+    @IsTest
+    static void testGetFieldValueString() {
+        TestTriggerHandler triggerHandler = new TestTriggerHandler();
+
+        // Happy path
+        Contact c = new Contact(LastName = 'Foo');
+        Object lastNameValue = triggerHandler.getFieldValue(c, Contact.LastName);
+        Assert.equals('Foo', lastNameValue);
+
+        // Null handling
+        Assert.isNull(triggerHandler.getFieldValue(null, (String)null));
+        Assert.isNull(triggerHandler.getFieldValue(c, (String)null));
+        Assert.isNull(triggerHandler.getFieldValue(null, Contact.LastName.getDescribe().getName()));
+
+        // Invalid field for type
+        try {
+            triggerHandler.getFieldValue(c, Account.AccountNumber.getDescribe().getName());
+            Assert.fail('Expected an ' + SObjectException.class.getName());
+        } catch (SObjectException e) {
+            // Expected
+        }
+    }
+
+    @IsTest
+    static void testFieldValueChangedString() {
+        TestTriggerHandler triggerHandler = new TestTriggerHandler();
+
+        Contact oldContact = new Contact(FirstName = 'Baz', LastName = 'Foo');
+        Contact newContact = new Contact(FirstName = 'Baz', LastName = 'Bar');
+
+        // Happy path
+        Assert.isTrue(triggerHandler.fieldValueChanged(oldContact, newContact, Contact.LastName.getDescribe().getName()));
+        Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, newContact, Contact.FirstName.getDescribe().getName()));
+
+        // Null handling
+        Assert.isFalse(triggerHandler.fieldValueChanged(null, null, (String)null));
+        Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, null, (String)null));
+        Assert.isFalse(triggerHandler.fieldValueChanged(null, newContact, (String)null));
+        Assert.isFalse(triggerHandler.fieldValueChanged(null, null, Contact.LastName.getDescribe().getName()));
+        Assert.isFalse(triggerHandler.fieldValueChanged(oldContact, newContact, (String)null));
+        Assert.isTrue(triggerHandler.fieldValueChanged(null, newContact, Contact.LastName.getDescribe().getName()));
+        Assert.isTrue(triggerHandler.fieldValueChanged(oldContact, null, Contact.LastName.getDescribe().getName()));
+
+        // Invalid field for type
+        try {
+            triggerHandler.fieldValueChanged(oldContact, newContact, Account.AccountNumber.getDescribe().getName());
             Assert.fail('Expected an ' + SObjectException.class.getName());
         } catch (SObjectException e) {
             // Expected
