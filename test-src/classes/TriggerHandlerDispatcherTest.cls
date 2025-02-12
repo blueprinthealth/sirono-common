@@ -15,7 +15,7 @@
  */
 
 @IsTest
-private class TriggerHandlerDispatcherTest {
+public class TriggerHandlerDispatcherTest {
     private static final String STANDARD_PROFILE_NAME = 'Standard User';
     private static final String STANDARD_USER1_NAME = 'standard1@nowhere.com';
     private static final String STANDARD_USER2_NAME = 'standard2@nowhere.com';
